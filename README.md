@@ -1,70 +1,90 @@
-# Getting Started with Create React App
+# Pasos a seguir con Docker
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Primero crear un archivo Dockerfile
 
-## Available Scripts
+## Segundo build la imagen:
 
-In the project directory, you can run:
+`docker build -t react-image .`
 
-### `yarn start`
+## tercero crear un container
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+`docker run -v (pwd)/src:/app/src -d -p 3000:3000 --name react-app react-image`
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+**Para solo lectura**
+`docker run -v (pwd)/src:/app/src:ro -d -p 3000:3000 --name react-app react-image`
 
-### `yarn test`
+**Con archivo de variable de entorno**
+`docker run --env-file ./.env -v (pwd)/src:/app/src -d -p 3000:3000 --name react-app react-image`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Aqui podemos ver como incluimos tanto lo volumenes (-v) como el puerto(-p), para varibales de entorno (-e) y el nombre
 
-### `yarn build`
+### entrar en el contenerdor con Bash
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+`docker exec -it react-app bash`
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Comandos de ayuda:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+`docker ps` => para ver los contenedores que se estan ejecutando
+`docker ps -a` => para ver todos los contenedores.
+`docker rm <nombre> -f` => para eliminar un contendor.
+`docker image rm <nombre>` o `docker -rmi <nombre>`=> para eliminar una images.
+`-e MY_VARIABLE=variable` => se puede agregar variables de entorno.
 
-### `yarn eject`
+## Comandos de limpieza de imagenes
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Fish : `docker stop (docker ps -a -q)` => detener todos los contenedores en ejecucioón
+Fish : `docker rmi (docker images -q)` => para eliminar todas la imagenes
+Fish : `docker rm (docker ps -a -q)` => para eliminar todos los contenedores
+Fish : `docker rmi $(docker images dangling=true -q)` => Eliminar las imágenes no tageadas dangling.
+Fish : `docker rmi (docker images | tail -n +2 | awk '$1 == "<none>" {print $'3'}')` => Elimina todas las imagenes con "none"
+Fish : `docker image prune` => Eliminar las imágenes no tageadas dangling. Opciones docker images
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Comandos con volumenes
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```shell
+# ver todos los volumenes
+docker volume ls
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+# Ver detalles de determinado volumen
+docker volume inspect nombre_volumen
+```
 
-## Learn More
+### Eliminar volumenes
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```shell
+# eliminaremos los volúmenes de contenedores que ya no existen
+docker volume prune
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+# Para eliminar un volumen
+docker volume rm nombre_volumen
+```
 
-### Code Splitting
+## Trabajar con varios archivos Dockerfile
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+`docker build -f Dockerfile.dev .`
 
-### Analyzing the Bundle Size
+# Trabajar con Docker-Compose
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Para contruir una imagen
 
-### Making a Progressive Web App
+`docker-compose build`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Para contruir una imagen y ejecutar el archivo
 
-### Advanced Configuration
+`docker-compose up --build`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Para ejecutar las intrucciones del archivo docker-compose.yml
 
-### Deployment
+`docker-compose up -d`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Para destruir el container createdo con docker-compose
 
-### `yarn build` fails to minify
+`docker-compose down`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Crear contenedor de desarrollo
+
+`docker-compose -f docker-compose.yml -f docker-compose-dev.yml up -d --build`
+
+## Crear contenedor de producción
+
+`docker-compose -f docker-compose.yml -f docker-compose-prod.yml up -d --build`

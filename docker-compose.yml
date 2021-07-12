@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  react-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    # env_file:
+    #   - ./.env
