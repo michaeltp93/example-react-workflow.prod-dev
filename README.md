@@ -38,16 +38,16 @@ docker ps -a
 # Para ver los contenedores que se estan ejecutando
 docker ps
 
-# Para eliminar un contendor.
+# Para eliminar un contendor
 docker rm <nombre> -f
 
-# Para eliminar una images.
+# Para eliminar una images
 docker image rm <nombre>
 
 # ó
 docker -rmi <nombre>
 
-# Se puede agregar variables de entorno.
+# Se puede agregar variables de entorno
 -e MY_VARIABLE=variable
 ```
 
@@ -66,7 +66,7 @@ docker rmi (docker images -q)
 docker rm (docker ps -a -q)
 
 # Eliminar las imágenes no tageadas dangling.
-docker rmi $(docker images dangling=true -q)
+docker rmi (docker images dangling=true -q)
 
 # Elimina todas las imagenes con <none>
 docker rmi (docker images | tail -n +2 | awk '$1 == "<none>" {print $'3'}')
